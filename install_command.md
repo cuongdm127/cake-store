@@ -9,8 +9,28 @@ npx create-next-app@latest frontend
 cd frontend
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
+npm install next-i18next react-i18next i18next
+
 Configure Tailwind in tailwind.config.js and add the global styles.
-Initialize the Backend API
+Create next-i18next.config.js
+At the root of your frontend folder:
+// next-i18next.config.js
+module.exports = {
+  i18n: {
+    defaultLocale: 'en',
+    locales: ['en', 'vi'],
+  },
+};
+
+Update next.config.js
+Import and add the i18n config:
+const { i18n } = require('./next-i18next.config');
+
+module.exports = {
+  reactStrictMode: true,
+  i18n,
+};
+
 ```
 ## Install Backend
 ```bash
