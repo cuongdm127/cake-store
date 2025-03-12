@@ -1,5 +1,13 @@
 import { Product } from "@/types/Product";
-import { createContext, ReactNode, useContext, useReducer } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
+import { useAuth } from "./AuthContext";
+import axios from "axios";
 
 type CartItem = Product & { quantity: number };
 
@@ -12,7 +20,8 @@ type Action =
   | { type: "REMOVE_ITEM"; productId: string }
   | { type: "CLEAR_CART" }
   | { type: "INCREASE_ITEM"; productId: string }
-  | { type: "DECREASE_ITEM"; productId: string };
+  | { type: "DECREASE_ITEM"; productId: string }
+  | { type: "SET_CART"; items: CartItem[] };
 const initialState: CartState = {
   items: [],
 };
@@ -65,6 +74,9 @@ function cartReducer(state: CartState, action: Action): CartState {
       return { items: [] };
     }
 
+    case "SET_CART":
+      return { items: action.items };
+
     default:
       return state;
   }
@@ -81,6 +93,61 @@ const CartContext = createContext<{
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const { user } = useAuth();
+
+  // 1. Load user cart on login
+  useEffect(() => {
+    const loadUserCart = async () => {
+      if (user) {
+        try {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          );
+          dispatch({ type: "SET_CART", items: res.data.items });
+        } catch (error) {
+          console.error("Failed to load user cart:", error);
+        }
+      }
+    };
+
+    loadUserCart();
+  }, [user]);
+
+  // 2. Save cart to backend when items change (for logged-in user)
+  useEffect(() => {
+    const saveCart = async () => {
+      if (user) {
+        console.log(state.items);
+        try {
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+            {
+              items: state.items.map((item) => ({
+                productId: item._id,
+                quantity: item.quantity,
+              })),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          );
+        } catch (error) {
+          console.error("Failed to save cart:", error);
+        }
+      }
+    };
+
+    if (state.items.length > 0) {
+      saveCart();
+    }
+  }, [state.items, user]);
 
   const addItem = (product: Product) => dispatch({ type: "ADD_ITEM", product });
   const removeItem = (productId: string) =>

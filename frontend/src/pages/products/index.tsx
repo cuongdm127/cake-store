@@ -23,8 +23,9 @@ const ProductListPage = ({ products }: ProductListPageProps) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  console.log("API_URL:", process.env.API_URL);
+  
   const res = await fetch(`${process.env.API_URL}/products`);
+  console.log(res);
   const products: Product[] = await res.json();
 
   return {
