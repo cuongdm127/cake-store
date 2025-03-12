@@ -48,13 +48,13 @@
   * GET /api/orders/user/:userId (list user orders)
 ### 2.3 User Authentication & Authorization
 #### 2.3.1 Backend
-* 2.3.1.1 Define User Model
-* 2.3.1.2 Register & Login API (JWT-based auth)
+* 2.3.1.1 Define User Model ✅
+* 2.3.1.2 Register & Login API (JWT-based auth) ✅
 * 2.3.1.3 Protect admin routes (CRUD products, orders)
-* 2.3.1.4 Password hashing with bcrypt
+* 2.3.1.4 Password hashing with bcrypt ✅
 #### 2.3.2 Frontend
-* 2.3.2.1 Login & Register pages
-* 2.3.2.2 Manage user sessions (JWT storage)
+* 2.3.2.1 Login & Register pages ✅
+* 2.3.2.2 Manage user sessions (JWT storage) ✅
 * 2.3.2.3 Restrict access to Admin Dashboard
 * 2.3.2.4 Show user profile and order history
 ## 3. Admin Dashboard
@@ -69,7 +69,7 @@
 ### 4.1 Responsive Layouts (Mobile/Desktop)
 ### 4.2 Home Page (Hero banner, featured products, categories)
 ### 4.3 Add Language Switcher (English/Vietnamese i18n)
-### 4.4 Footer & Header Components
+### 4.4 Footer & Header Components ✅
 ### 4.5 Toast Notifications (success/error messages)
 ## 5. Analytics and Reporting (Admin)
 ### 5.1 Sales Reports (daily/weekly/monthly revenue)
