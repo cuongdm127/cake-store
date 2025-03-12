@@ -11,19 +11,19 @@ const products = [
     name: 'Chocolate Fudge Cake',
     description: 'Rich chocolate cake with fudge topping.',
     price: 20,
-    image: 'https://images.unsplash.com/photo-1505250469679-203ad9ced0cb',
+    image: 'https://static.vecteezy.com/system/resources/thumbnails/053/190/619/small/gourmet-berry-chocolate-cake-on-elegant-table-setting-free-photo.jpg',
   },
   {
     name: 'Strawberry Shortcake',
     description: 'Layers of fresh strawberries and whipped cream.',
     price: 18,
-    image: 'https://images.unsplash.com/photo-1542925305-2eb9c9b36c38',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQynJ0YZfnTBokj3ENuMe1E9HkAq2-ZIuD_Zg&s',
   },
   {
     name: 'Vanilla Sponge Cake',
     description: 'Soft and fluffy vanilla sponge cake.',
     price: 15,
-    image: 'https://images.unsplash.com/photo-1599785209707-28d6eb9c5b9d',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQynJ0YZfnTBokj3ENuMe1E9HkAq2-ZIuD_Zg&s',
   },
 ];
 
