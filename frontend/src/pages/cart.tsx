@@ -22,21 +22,21 @@ const CartPage = () => {
             <ul className="space-y-4">
               {state.items.map((item) => (
                 <li
-                  key={item.id}
+                  key={item._id}
                   className="flex justify-between items-center border-b pb-4"
                 >
                   <div>
                     <h3 className="font-semibold">{item.name}</h3>
                     <div className="flex items-center space-x-2 mt-2">
                       <button
-                        onClick={() => decreaseItem(item.id)}
+                        onClick={() => decreaseItem(item._id)}
                         className="px-2 py-1 bg-gray-300 rounded hover:bg-gray-400"
                       >
                         -
                       </button>
                       <span className="text-sm">{item.quantity}</span>
                       <button
-                        onClick={() => increaseItem(item.id)}
+                        onClick={() => increaseItem(item._id)}
                         className="px-2 py-1 bg-gray-300 rounded hover:bg-gray-400"
                       >
                         +
@@ -49,7 +49,7 @@ const CartPage = () => {
                       ${item.price * item.quantity}
                     </span>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item._id)}
                       className="text-red-500 hover:underline text-sm"
                     >
                       Remove

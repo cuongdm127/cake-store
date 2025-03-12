@@ -1,4 +1,4 @@
-import { Product } from "@/data/products";
+import { Product } from "@/types/Product";
 import { createContext, ReactNode, useContext, useReducer } from "react";
 
 type CartItem = Product & { quantity: number };
@@ -9,10 +9,10 @@ type CartState = {
 
 type Action =
   | { type: "ADD_ITEM"; product: Product }
-  | { type: "REMOVE_ITEM"; productId: number }
+  | { type: "REMOVE_ITEM"; productId: string }
   | { type: "CLEAR_CART" }
-  | { type: "INCREASE_ITEM"; productId: number }
-  | { type: "DECREASE_ITEM"; productId: number };
+  | { type: "INCREASE_ITEM"; productId: string }
+  | { type: "DECREASE_ITEM"; productId: string };
 const initialState: CartState = {
   items: [],
 };
@@ -21,7 +21,7 @@ function cartReducer(state: CartState, action: Action): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
       const itemIndex = state.items.findIndex(
-        (item) => item.id === action.product.id
+        (item) => item._id === action.product._id
       );
       const updatedItems = [...state.items];
 
@@ -36,7 +36,7 @@ function cartReducer(state: CartState, action: Action): CartState {
 
     case "INCREASE_ITEM": {
       const updatedItems = state.items.map((item) =>
-        item.id === action.productId
+        item._id === action.productId
           ? { ...item, quantity: item.quantity + 1 }
           : item
       );
@@ -46,7 +46,7 @@ function cartReducer(state: CartState, action: Action): CartState {
     case "DECREASE_ITEM": {
       const updatedItems = state.items
         .map((item) =>
-          item.id === action.productId
+          item._id === action.productId
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
@@ -56,7 +56,7 @@ function cartReducer(state: CartState, action: Action): CartState {
 
     case "REMOVE_ITEM": {
       const updatedItems = state.items.filter(
-        (item) => item.id !== action.productId
+        (item) => item._id !== action.productId
       );
       return { items: updatedItems };
     }
@@ -73,22 +73,22 @@ function cartReducer(state: CartState, action: Action): CartState {
 const CartContext = createContext<{
   state: CartState;
   addItem: (product: Product) => void;
-  removeItem: (productId: number) => void;
+  removeItem: (productId: string) => void;
   clearCart: () => void;
-  increaseItem: (productId: number) => void;
-  decreaseItem: (productId: number) => void;
+  increaseItem: (productId: string) => void;
+  decreaseItem: (productId: string) => void;
 } | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
   const addItem = (product: Product) => dispatch({ type: "ADD_ITEM", product });
-  const removeItem = (productId: number) =>
+  const removeItem = (productId: string) =>
     dispatch({ type: "REMOVE_ITEM", productId });
   const clearCart = () => dispatch({ type: "CLEAR_CART" });
-  const increaseItem = (productId: number) =>
+  const increaseItem = (productId: string) =>
     dispatch({ type: "INCREASE_ITEM", productId });
-  const decreaseItem = (productId: number) =>
+  const decreaseItem = (productId: string) =>
     dispatch({ type: "DECREASE_ITEM", productId });
 
   return (
