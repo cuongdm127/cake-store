@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import productRoutes from './routes/productRoutes';
 import connectDB from './config/db';
+import userRoutes from './routes/userRoutes';
 
 const app = express();
 
@@ -17,6 +18,7 @@ connectDB();
 
 // Routes
 app.use('/api/products', productRoutes);
+app.use('/api/users', userRoutes);
 
 // Root route
 app.get('/', (_req, res) => {
