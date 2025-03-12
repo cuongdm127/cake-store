@@ -42,6 +42,14 @@ export const loginUser = async (req: Request, res: Response) => {
 
   const user = await User.findOne({ email });
 
+  if (!user) {
+    res.status(404).json({ message: 'Your email is not registered. Please register.' });
+  }
+  
+  if (user && !(await user.matchPassword(password))) {
+    res.status(401).json({ message: 'Invalid password' });
+  }
+
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
@@ -50,8 +58,6 @@ export const loginUser = async (req: Request, res: Response) => {
       role: user.role,
       token: generateToken(user._id.toString(), user.role),
     });
-  } else {
-    res.status(401).json({ message: 'Invalid email or password' });
   }
 };
 
