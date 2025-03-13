@@ -41,11 +41,11 @@
 * 2.2.1.3 Cart Page (list items, quantity update, remove item) ✅
 * 2.2.1.4 Checkout Form (shipping info)
 #### 2.2.2 Backend
-* 2.2.2.1 Define Order Model
-* 2.2.2.2 Create API routes for Orders (CRUD):
-  * POST /api/orders (create order)
-  * GET /api/orders/:id (view order)
-  * GET /api/orders/user/:userId (list user orders)
+* 2.2.2.1 Define Order Model ✅
+* 2.2.2.2 Create API routes for Orders (CRUD): ✅
+  * POST /api/orders (create order) ✅
+  * GET /api/orders/:id (view order) ✅
+  * GET /api/orders/user/:userId (list user orders) ✅
 ### 2.3 User Authentication & Authorization
 #### 2.3.1 Backend
 * 2.3.1.1 Define User Model ✅
@@ -55,13 +55,13 @@
 #### 2.3.2 Frontend
 * 2.3.2.1 Login & Register pages ✅
 * 2.3.2.2 Manage user sessions (JWT storage) ✅
-* 2.3.2.3 Restrict access to Admin Dashboard
+* 2.3.2.3 Restrict access to Admin Dashboard ✅
 * 2.3.2.4 Show user profile and order history
 ## 3. Admin Dashboard
 ### 3.1 Backend
-#### 3.1.1 Protect admin APIs (JWT + Role-based auth)
+#### 3.1.1 Protect admin APIs (JWT + Role-based auth) ✅
 ### 3.2 Frontend
-#### 3.2.1 Create Admin Dashboard Layout
+#### 3.2.1 Create Admin Dashboard Layout ✅
 #### 3.2.2 Product Management UI (CRUD operations)
 #### 3.2.3 Order Management UI (view, update order status)
 #### 3.2.4 User Management UI (list users, change roles)
