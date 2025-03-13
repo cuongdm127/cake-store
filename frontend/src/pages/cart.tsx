@@ -1,9 +1,8 @@
-import MainLayout from "@/components/layout/MainLayout";
 import { useCart } from "@/context/CartContext";
+import Link from "next/link"; // ✅ Import Link to navigate to checkout
 
 const CartPage = () => {
-  const { state, removeItem, clearCart, increaseItem, decreaseItem } =
-    useCart();
+  const { state, removeItem, clearCart, increaseItem, decreaseItem } = useCart();
 
   const totalPrice = state.items.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -11,7 +10,6 @@ const CartPage = () => {
   );
 
   return (
-    <MainLayout>
       <div className="max-w-4xl mx-auto px-4 py-10">
         <h1 className="text-3xl font-bold mb-8">Your Cart 🛒</h1>
 
@@ -59,19 +57,37 @@ const CartPage = () => {
               ))}
             </ul>
 
-            <div className="mt-8 flex justify-between items-center">
-              <span className="text-xl font-bold">Total: ${totalPrice}</span>
-              <button
-                onClick={clearCart}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-              >
-                Clear Cart
-              </button>
+            <div className="mt-8 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+              <span className="text-xl font-bold">
+                Total: ${totalPrice.toFixed(2)}
+              </span>
+
+              <div className="flex space-x-4">
+                <button
+                  onClick={clearCart}
+                  className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+                >
+                  Clear Cart
+                </button>
+
+                {/* ✅ Checkout Button */}
+                <Link href="/checkout">
+                  <button
+                    className={`px-6 py-2 rounded text-white ${
+                      state.items.length === 0
+                        ? "bg-gray-300 cursor-not-allowed"
+                        : "bg-pink-600 hover:bg-pink-700"
+                    }`}
+                    disabled={state.items.length === 0}
+                  >
+                    Proceed to Checkout
+                  </button>
+                </Link>
+              </div>
             </div>
           </>
         )}
       </div>
-    </MainLayout>
   );
 };
 

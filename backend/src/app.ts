@@ -7,6 +7,11 @@ import productRoutes from './routes/productRoutes';
 import connectDB from './config/db';
 import userRoutes from './routes/userRoutes';
 import cartRoutes from './routes/cartRoutes';
+import orderRoutes from './routes/orderRoutes';
+import adminProductRoutes from './routes/admin/adminProductRoutes';
+import adminOrderRoutes from './routes/admin/adminOrderRoutes';
+import adminUserRoutes from './routes/admin/adminUserRoutes';
+
 
 const app = express();
 
@@ -21,6 +26,12 @@ connectDB();
 app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
+
+app.use('/api/admin/products', adminProductRoutes);
+app.use('/api/admin/orders', adminOrderRoutes);
+app.use('/api/admin/users', adminUserRoutes);
+
 
 // Root route
 app.get('/', (_req, res) => {

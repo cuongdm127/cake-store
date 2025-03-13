@@ -1,8 +1,7 @@
-import MainLayout from '../components/layout/MainLayout';
 
 export default function Home() {
   return (
-    <MainLayout>
+    <>
       <section className="flex flex-col items-center justify-center text-center">
         <h1 className="text-4xl font-bold text-gray-800 mb-4 flex items-center gap-2">
           Welcome to Bake Store! 🍰
@@ -14,6 +13,6 @@ export default function Home() {
           Shop Now
         </button>
       </section>
-    </MainLayout>
+    </>
   );
 }

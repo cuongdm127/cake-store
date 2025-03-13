@@ -108,6 +108,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
               },
             }
           );
+          console.log(res.data.items);
           dispatch({ type: "SET_CART", items: res.data.items });
         } catch (error) {
           console.error("Failed to load user cart:", error);
@@ -122,8 +123,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const saveCart = async () => {
       if (user) {
-        console.log(state.items);
         try {
+          console.log(state);
           await axios.post(
             `${process.env.NEXT_PUBLIC_API_URL}/cart`,
             {
@@ -152,7 +153,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const addItem = (product: Product) => dispatch({ type: "ADD_ITEM", product });
   const removeItem = (productId: string) =>
     dispatch({ type: "REMOVE_ITEM", productId });
-  const clearCart = () => dispatch({ type: "CLEAR_CART" });
+  const clearCart = async () => {
+    try {
+      if (user) {
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        console.log("Cart cleared from backend");
+      }
+
+      dispatch({ type: "CLEAR_CART" });
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
+    }
+  };
   const increaseItem = (productId: string) =>
     dispatch({ type: "INCREASE_ITEM", productId });
   const decreaseItem = (productId: string) =>
