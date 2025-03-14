@@ -4,6 +4,7 @@ import {
   createProduct,
   updateProduct,
   deleteProduct,
+  getProductById
 } from '../../controllers/admin/adminProductController';
 import { protect } from '../../middleware/authMiddleware';
 import {adminMiddleware} from '../../middleware/adminMiddleware';
@@ -14,6 +15,7 @@ router.use(protect, adminMiddleware);
 
 router.get('/', getAllProducts);
 router.post('/', createProduct);
+router.get("/:id", getProductById);
 router.put('/:id', updateProduct);
 router.delete('/:id', deleteProduct);
 

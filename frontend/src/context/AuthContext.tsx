@@ -79,7 +79,7 @@ const useAdminGuard = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return; 
+    if (loading) return;
 
     if (!user) {
       router.push("/login");
@@ -91,6 +91,11 @@ const useAdminGuard = () => {
       return;
     }
   }, [user, loading, router]);
+
+  return {
+    isLoading: loading,
+    isAdmin: user?.role === "admin",
+  };
 };
 
 export default useAdminGuard;

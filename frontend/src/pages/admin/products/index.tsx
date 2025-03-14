@@ -1,26 +1,19 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useAuth } from "@/context/AuthContext";
+import useAdminGuard, { useAuth } from "@/context/AuthContext";
 import { Product } from "@/types/Product";
-import { useRouter } from "next/router";
 
 const AdminProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (!user || user.role !== "admin") {
-      router.push("/login"); // or display a 403 page
-    } else {
-      fetchProducts();
-    }
-  }, [user]);
+  // ✅ Use admin guard and get its loading/admin status
+  const { isLoading: authLoading, isAdmin } = useAdminGuard();
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     setLoading(true);
     try {
       const res = await axios.get<Product[]>(
@@ -37,7 +30,15 @@ const AdminProductsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  },[user?.token]);
+
+  // ✅ Wait until admin check finishes
+  useEffect(() => {
+    if (authLoading || !isAdmin) return; // Wait until user loads and is verified as admin
+    // ✅ Fetch products inside useEffect (no direct calls!)
+    
+    fetchProducts();
+  }, [authLoading, fetchProducts, isAdmin]);
 
   const deleteProduct = async (productId: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
@@ -51,16 +52,32 @@ const AdminProductsPage = () => {
           },
         }
       );
-      fetchProducts(); // Refresh product list
+      fetchProducts(); // Refresh product list after delete
     } catch (error) {
       console.error("Delete failed:", error);
     }
   };
 
+  // ✅ Show loading while adminGuard is still running
+  if (authLoading) {
+    return (
+      <AdminLayout>
+        <p>Checking admin permissions...</p>
+      </AdminLayout>
+    );
+  }
+
+  // ✅ Optionally render nothing (already redirecting in useAdminGuard)
+  if (!isAdmin) {
+    return null;
+  }
+
   return (
     <AdminLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-pink-600">Products Management</h1>
+        <h1 className="text-3xl font-bold text-pink-600">
+          Products Management
+        </h1>
         <Link
           href="/admin/products/create"
           className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700"
@@ -94,7 +111,7 @@ const AdminProductsPage = () => {
                 <tr key={product._id} className="border-t">
                   <td className="py-3 px-6">{product.name}</td>
                   <td className="py-3 px-6">${product.price}</td>
-                  <td className="py-3 px-6">{product.stock}</td>
+                  <td className="py-3 px-6">{product.stock > 0 ? product.stock : 'Out Of Stock'}</td>
                   <td className="py-3 px-6 flex gap-2">
                     <Link
                       href={`/admin/products/${product._id}/edit`}

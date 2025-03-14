@@ -36,7 +36,7 @@ export const updateProduct = async (req: Request, res: Response) => {
     product.description = description || product.description;
     product.price = price || product.price;
     product.image = image || product.image;
-    product.stock = stock || product.stock;
+    product.stock = stock ?? product.stock;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);
@@ -55,5 +55,24 @@ export const deleteProduct = async (req: Request, res: Response) => {
     res.json({ message: 'Product deleted' });
   } else {
     res.status(404).json({ message: 'Product not found' });
+  }
+};
+
+// @desc    Get product by ID
+// @route   GET /api/products/:id
+// @access  Public
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      res.status(404).json({ message: "Product not found" });
+      return;
+    }
+
+    res.json(product);
+  } catch (error) {
+    console.error("Error fetching product by ID:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };

@@ -34,7 +34,7 @@ const orderItemSchema = new Schema<IOrderItem>({
 });
 
 const orderSchema = new Schema<IOrder>({
-    userId: { type: String, require: true },
+    userId: { type: String, ref: 'User', require: true },
     orderItems: [orderItemSchema],
     shippingAddress: {
         fullName: { type: String, require: true },
