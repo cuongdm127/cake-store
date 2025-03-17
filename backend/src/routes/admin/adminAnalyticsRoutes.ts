@@ -5,6 +5,8 @@ import {
     getTotalSales,
     getTopProducts,
     getOrderTrends,
+    getOrderStats,
+    getCompletedRevenue
 }
     from '../../controllers/admin/adminAnalyticsController'
 
@@ -16,5 +18,8 @@ router.use(adminMiddleware);
 router.get('/total-sales', getTotalSales);
 router.get('/top-products', getTopProducts);
 router.get('/order-trends', getOrderTrends);
+router.get('/orders-stats', getOrderStats);
+router.get('/completed-revenue', getCompletedRevenue);
+
 
 export default router;

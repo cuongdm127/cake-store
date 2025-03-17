@@ -1,49 +1,43 @@
-import dotenv from 'dotenv';
-dotenv.config();
+
 
 import mongoose from 'mongoose';
-import connectDB from '../config/db';
+import dotenv from 'dotenv';
 import Product from '../models/Product';
+import { faker } from '@faker-js/faker';
 
-// Sample products data
-const products = [
-  {
-    name: 'Chocolate Fudge Cake',
-    description: 'Rich chocolate cake with fudge topping.',
-    price: 20,
-    image: 'https://static.vecteezy.com/system/resources/thumbnails/053/190/619/small/gourmet-berry-chocolate-cake-on-elegant-table-setting-free-photo.jpg',
-  },
-  {
-    name: 'Strawberry Shortcake',
-    description: 'Layers of fresh strawberries and whipped cream.',
-    price: 18,
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQynJ0YZfnTBokj3ENuMe1E9HkAq2-ZIuD_Zg&s',
-  },
-  {
-    name: 'Vanilla Sponge Cake',
-    description: 'Soft and fluffy vanilla sponge cake.',
-    price: 15,
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQynJ0YZfnTBokj3ENuMe1E9HkAq2-ZIuD_Zg&s',
-  },
-];
+dotenv.config();
 
-// Seed function
-const importData = async () => {
+const connectDB = async () => {
+  await mongoose.connect(process.env.MONGO_URI as string);
+  console.log('MongoDB connected!');
+};
+
+const seedProducts = async () => {
   try {
     await connectDB();
 
-    // Clear the collection first (optional)
     await Product.deleteMany();
 
-    // Insert sample data
-    const createdProducts = await Product.insertMany(products);
+    const products = [];
 
-    console.log(`✅ Successfully imported ${createdProducts.length} products!`);
+    for (let i = 0; i < 50; i++) {
+      products.push({
+        name: faker.commerce.productName() + ' Cake',
+        description: faker.commerce.productDescription(),
+        price: faker.number.float({ min: 10, max: 100, fractionDigits: 2 }),
+        stock: faker.number.int({ min: 0, max: 100 }),
+        image: 'https://static.vecteezy.com/system/resources/thumbnails/053/190/619/small/gourmet-berry-chocolate-cake-on-elegant-table-setting-free-photo.jpg', // or unsplash static if you prefer
+      });
+    }
+
+    const createdProducts = await Product.insertMany(products);
+    console.log(`${createdProducts.length} Products Seeded ✅`);
+
     process.exit();
   } catch (error) {
-    console.error('❌ Error importing data:', error);
+    console.error(error);
     process.exit(1);
   }
 };
 
-importData();
+seedProducts();

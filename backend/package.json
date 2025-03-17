@@ -4,13 +4,18 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "start": "tsc && node dist/app.js"
+    "start": "tsc && node dist/app.js",
+    "seed:users": "ts-node src/seeders/seedUsers.ts",
+    "seed:products": "ts-node src/seeders/seedProducts.ts",
+    "seed:orders": "ts-node src/seeders/seedOrders.ts",
+    "seed:all": "npm run seed:users && npm run seed:products && npm run seed:orders"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@faker-js/faker": "^9.6.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

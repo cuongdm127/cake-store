@@ -27,7 +27,6 @@ const AdminOrdersPage = () => {
           },
         }
       );
-      console.log(res.data);
       setOrders(res.data);
     } catch (error) {
       console.error("Failed to fetch orders:", error);

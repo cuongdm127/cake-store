@@ -18,6 +18,12 @@ export const getTotalSales = async (_req: Request, res: Response) => {
 export const getTopProducts = async (_req: Request, res: Response) => {
   try {
     const products = await Order.aggregate([
+      {
+        $match: {                          // ✅ Only completed orders
+          isPaid: true,
+          isDelivered: true,
+        }
+      },
       { $unwind: '$orderItems' },
       {
         $group: {
@@ -53,27 +59,110 @@ export const getTopProducts = async (_req: Request, res: Response) => {
   }
 };
 
-// @desc Get Order Trends (last 7 days)
-export const getOrderTrends = async (_req: Request, res: Response) => {
+export const getOrderTrends = async (req: Request, res: Response) => {
   try {
+    // Default to last 7 days
+    const range = req.query.range || '7d';
+
+    // Determine date range & group format
+    let dateFrom = new Date();
+    let groupBy: any = {};
+
+    if (range === '7d') {
+      dateFrom.setDate(dateFrom.getDate() - 7);
+      groupBy = {
+        year: { $year: '$createdAt' },
+        month: { $month: '$createdAt' },
+        day: { $dayOfMonth: '$createdAt' }
+      };
+    } else if (range === '30d') {
+      dateFrom.setDate(dateFrom.getDate() - 30);
+      groupBy = {
+        year: { $year: '$createdAt' },
+        month: { $month: '$createdAt' },
+        day: { $dayOfMonth: '$createdAt' }
+      };
+    } else if (range === '365d') {
+      dateFrom.setFullYear(dateFrom.getFullYear() - 1);
+      groupBy = {
+        year: { $year: '$createdAt' },
+        month: { $month: '$createdAt' }
+      };
+    }
+
     const trends = await Order.aggregate([
       {
-        $group: {
-          _id: {
-            year: { $year: '$createdAt' },
-            month: { $month: '$createdAt' },
-            day: { $dayOfMonth: '$createdAt' },
-          },
-          totalSales: { $sum: '$totalPrice' },
-          orders: { $sum: 1 },
-        },
+        $match: {
+          createdAt: { $gte: dateFrom }
+        }
       },
-      { $sort: { '_id.year': -1, '_id.month': -1, '_id.day': -1 } },
-      { $limit: 7 }
+      {
+        $group: {
+          _id: groupBy,
+          totalSales: { $sum: '$totalPrice' },
+          totalOrders: { $sum: 1 },
+          deliveredOrders: {
+            $sum: { $cond: ['$isDelivered', 1, 0] }
+          },
+          paidOrders: {
+            $sum: { $cond: ['$isPaid', 1, 0] }
+          },
+          unpaidOrders: {
+            $sum: { $cond: ['$isPaid', 0, 1] }
+          }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
     ]);
 
-    res.json(trends.reverse()); // reverse for chronological order
+    res.json(trends);
   } catch (error) {
+    console.error('Error fetching order trends:', error);
     res.status(500).json({ message: 'Failed to fetch order trends' });
   }
 };
+
+
+
+export const getOrderStats = async (_req: Request, res: Response) => {
+  try {
+    const totalOrders = await Order.countDocuments();
+
+    const paidOrders = await Order.countDocuments({ isPaid: true });
+    const unpaidOrders = totalOrders - paidOrders;
+
+    const deliveredOrders = await Order.countDocuments({ isDelivered: true });
+    const pendingDeliveries = totalOrders - deliveredOrders;
+
+    res.json({
+      totalOrders,
+      paidOrders,
+      unpaidOrders,
+      deliveredOrders,
+      pendingDeliveries
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch order stats' });
+  }
+};
+
+export const getCompletedRevenue = async (_req: Request, res: Response) => {
+  try {
+    const completedRevenue = await Order.aggregate([
+      { $match: { isPaid: true, isDelivered: true } },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$totalPrice' },
+        },
+      },
+    ]);
+
+    res.json({ totalRevenue: completedRevenue[0]?.totalRevenue || 0 });
+  } catch (error) {
+    console.error('Completed revenue error', error);
+    res.status(500).json({ message: 'Failed to calculate completed revenue' });
+  }
+};
+
+

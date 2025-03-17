@@ -4,8 +4,10 @@ import { getUserCart, saveUserCart, clearUserCart } from '../controllers/cartCon
 
 const router = express.Router();
 
-router.get('/', protect, getUserCart);      // Get saved cart
-router.post('/', protect, saveUserCart);    // Save or update cart
-router.delete('/', protect, clearUserCart); // Clear cart (optional)
+router.use(protect);
+
+router.get('/', getUserCart);      // Get saved cart
+router.post('/', saveUserCart);    // Save or update cart
+router.delete('/', clearUserCart); // Clear cart (optional)
 
 export default router;

@@ -93,12 +93,12 @@ const CartContext = createContext<{
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // 1. Load user cart on login
   useEffect(() => {
     const loadUserCart = async () => {
-      if (user) {
+      if (user && user.role === "user") {
         try {
           const res = await axios.get(
             `${process.env.NEXT_PUBLIC_API_URL}/cart`,
@@ -112,17 +112,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           dispatch({ type: "SET_CART", items: res.data.items });
         } catch (error) {
           console.error("Failed to load user cart:", error);
+
+          if (axios.isAxiosError(error) && error.response?.status === 401) {
+            alert("Session expired. Please login again.");
+            logout(); // clear user + redirect to login
+          }
         }
       }
     };
 
     loadUserCart();
-  }, [user]);
+  }, [logout, user]);
 
   // 2. Save cart to backend when items change (for logged-in user)
   useEffect(() => {
     const saveCart = async () => {
-      if (user) {
+      if (user && user.role === "user") {
         try {
           console.log(state);
           await axios.post(
