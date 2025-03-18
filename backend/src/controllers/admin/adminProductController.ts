@@ -76,3 +76,32 @@ export const getProductById = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getPaginatedProducts = async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const search = req.query.search || "";
+
+  const query = {
+    $or: [
+      { name: { $regex: search, $options: "i" } }
+    ],
+  };
+
+  try {
+    const total = await Product.countDocuments(query);
+    const products = await Product.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .sort({ createdAt: -1 }); // optional sorting
+
+    res.json({
+      products,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch products", error });
+  }
+};

@@ -24,26 +24,40 @@ const Header = () => {
 
         {/* Navigation Links */}
         <nav className="flex space-x-6 items-center relative">
-          <Link href="/" className="text-gray-600 hover:text-pink-600 transition">
+          <Link
+            href="/"
+            className="text-gray-600 hover:text-pink-600 transition"
+          >
             Home
           </Link>
 
-          <Link href="/products" className="text-gray-600 hover:text-pink-600 transition">
+          <Link
+            href="/products"
+            className="text-gray-600 hover:text-pink-600 transition"
+          >
             Products
           </Link>
 
-          <Link href="/about" className="text-gray-600 hover:text-pink-600 transition">
+          <Link
+            href="/about"
+            className="text-gray-600 hover:text-pink-600 transition"
+          >
             About
           </Link>
 
-          <Link href="/cart" className="relative text-gray-600 hover:text-pink-600 transition">
-            Cart
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -right-3 bg-pink-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {totalItems}
-              </span>
-            )}
-          </Link>
+          {user && user.role === "user" && (
+            <Link
+              href="/cart"
+              className="relative text-gray-600 hover:text-pink-600 transition"
+            >
+              Cart
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-3 bg-pink-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+          )}
 
           {/* User Dropdown */}
           {user ? (
@@ -57,13 +71,15 @@ const Header = () => {
 
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-20">
-                  <Link
-                    href="/orders"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    My Orders
-                  </Link>
+                  {user.role === "user" && (
+                    <Link
+                      href="/orders"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      My Orders
+                    </Link>
+                  )}
 
                   <Link
                     href="/profile"
@@ -75,7 +91,7 @@ const Header = () => {
 
                   {user.role === "admin" && (
                     <Link
-                      href="/admin/dashboard"
+                      href="/admin"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-pink-50"
                       onClick={() => setDropdownOpen(false)}
                     >
@@ -97,10 +113,16 @@ const Header = () => {
             </div>
           ) : (
             <>
-              <Link href="/login" className="text-gray-600 hover:text-pink-600 transition">
+              <Link
+                href="/login"
+                className="text-gray-600 hover:text-pink-600 transition"
+              >
                 Login
               </Link>
-              <Link href="/register" className="text-gray-600 hover:text-pink-600 transition">
+              <Link
+                href="/register"
+                className="text-gray-600 hover:text-pink-600 transition"
+              >
                 Register
               </Link>
             </>
