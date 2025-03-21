@@ -13,16 +13,20 @@ export const getAllProducts = async (_req: Request, res: Response) => {
 export const createProduct = async (req: Request, res: Response) => {
   const { name, description, price, image, stock } = req.body;
 
-  const product = new Product({
-    name,
-    description,
-    price,
-    image,
-    stock,
-  });
+  try {
+    const product = new Product({
+      name,
+      description,
+      price,
+      image,
+      stock,
+    });
 
-  const createdProduct = await product.save();
-  res.status(201).json(createdProduct);
+    const createdProduct = await product.save();
+    res.status(201).json(createdProduct);
+  } catch (error: any) {
+    res.status(400).json({ message: error })
+  }
 };
 
 // @desc    Update product by ID
