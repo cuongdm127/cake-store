@@ -19,6 +19,7 @@ const EditProductPage = () => {
 
   useEffect(() => {
     if (!id || !user) return;
+    if (!router.isReady || !user) return;
 
     const fetchProduct = async () => {
       try {
@@ -46,7 +47,7 @@ const EditProductPage = () => {
     };
 
     fetchProduct();
-  }, [id, user]);
+  }, [id, user, router.isReady]);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +76,8 @@ const EditProductPage = () => {
       setLoading(false);
     }
   };
+
+  if (typeof window === "undefined" || !router.isReady) return null;
 
   if (loadingProduct) {
     return (

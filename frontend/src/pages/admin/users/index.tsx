@@ -1,9 +1,9 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import useAdminGuard, { useAuth } from "@/context/AuthContext";
 
-import { useAdminUsers } from "./hooks";
-import UserFilters from "./components/UserFilters";
-import UserTable from "./components/UserTable";
+import { useAdminUsers } from "../../../hooks/useAdminUsers";
+import UserFilters from "../../../components/admin/users/UserFilters";
+import UserTable from "../../../components/admin/users/UserTable";
 
 const AdminUsersPage = () => {
   const { user } = useAuth();

@@ -1,8 +1,8 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import useAdminGuard, { useAuth } from "@/context/AuthContext";
-import OrderFilters from "./components/OrderFilters";
-import OrderTable from "./components/OrderTable";
-import { useAdminOrders } from "./hooks";
+import OrderFilters from "../../../components/admin/orders/OrderFilters";
+import OrderTable from "../../../components/admin/orders/OrderTable";
+import { useAdminOrders } from "../../../hooks/useAdminOrder";
 
 const AdminOrdersPage = () => {
   const { user } = useAuth();
