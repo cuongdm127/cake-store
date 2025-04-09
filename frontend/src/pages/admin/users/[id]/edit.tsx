@@ -20,6 +20,7 @@ const EditUserPage = () => {
 
   useEffect(() => {
     if (!id || !user) return;
+    if (!router.isReady || !user) return;
 
     const fetchUser = async () => {
       setLoading(true);
@@ -43,7 +44,7 @@ const EditUserPage = () => {
     };
 
     fetchUser();
-  }, [id, user]);
+  }, [id, user, router.isReady]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +67,8 @@ const EditUserPage = () => {
       setSaving(false);
     }
   };
+
+  if (typeof window === "undefined" || !router.isReady) return null;
 
   return (
     <AdminLayout>

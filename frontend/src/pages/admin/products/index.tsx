@@ -1,9 +1,9 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import useAdminGuard, { useAuth } from "@/context/AuthContext";
 
-import { useAdminProducts } from "./hooks";
-import ProductFilters from "./components/ProductFilters";
-import ProductTable from "./components/ProductTable";
+import { useAdminProducts } from "../../../hooks/useAdminProducts";
+import ProductFilters from "../../../components/admin/products/ProductFilters";
+import ProductTable from "../../../components/admin/products/ProductTable";
 import Link from "next/link";
 
 const AdminProductsPage = () => {

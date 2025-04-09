@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
 import Link from "next/link";
 import { Order } from "@/types/Order";
+import Image from "next/image";
 
 const OrderDetailsPage = () => {
   const router = useRouter();
@@ -15,6 +16,8 @@ const OrderDetailsPage = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!router.isReady || !user) return;
+
     const fetchOrder = async () => {
       if (!id || !user) return;
 
@@ -41,7 +44,9 @@ const OrderDetailsPage = () => {
     };
 
     fetchOrder();
-  }, [id, user]);
+  }, [id, user, router.isReady]);
+
+  if (typeof window === "undefined" || !router.isReady) return null;
 
   if (!user) {
     router.push("/login");
@@ -121,7 +126,7 @@ const OrderDetailsPage = () => {
               className="flex justify-between items-center border-b pb-4"
             >
               <div className="flex items-center space-x-4">
-                <img
+                <Image
                   src={item.imageUrl}
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded"

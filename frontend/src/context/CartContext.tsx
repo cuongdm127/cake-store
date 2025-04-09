@@ -153,7 +153,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     if (state.items.length > 0) {
       saveCart();
     }
-  }, [state.items, user]);
+  }, [state, state.items, user]);
 
   const addItem = (product: Product) => dispatch({ type: "ADD_ITEM", product });
   const removeItem = (productId: string) =>

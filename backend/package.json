@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
-    "start": "tsc && node dist/app.js",
+    "build": "tsc",
+    "start": "node dist/app.js",
     "seed:users": "ts-node src/seeders/seedUsers.ts",
     "seed:products": "ts-node src/seeders/seedProducts.ts",
     "seed:orders": "ts-node src/seeders/seedOrders.ts",
