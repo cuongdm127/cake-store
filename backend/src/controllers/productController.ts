@@ -3,8 +3,23 @@ import Product from '../models/Product';
 
 export const getAllProducts = async (_req: Request, res: Response): Promise<void> => {
     try {
-        const products = await Product.find();
-        res.json(products)
+        const page = Number(_req.query.page) || 1;      // page number
+        const limit = Number(_req.query.limit) || 10;   // items per page
+
+        const skip = (page - 1) * limit;
+
+        const products = await Product.find()
+            .skip(skip)
+            .limit(limit);
+
+        const total = await Product.countDocuments();
+
+        res.json({
+            products,
+            page,
+            pages: Math.ceil(total / limit),
+            total,
+        });
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }

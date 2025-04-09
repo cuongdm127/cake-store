@@ -1,5 +1,13 @@
-import { Product } from "@/data/products";
-import { createContext, ReactNode, useContext, useReducer } from "react";
+import { Product } from "@/types/Product";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useReducer,
+} from "react";
+import { useAuth } from "./AuthContext";
+import axios from "axios";
 
 type CartItem = Product & { quantity: number };
 
@@ -9,10 +17,11 @@ type CartState = {
 
 type Action =
   | { type: "ADD_ITEM"; product: Product }
-  | { type: "REMOVE_ITEM"; productId: number }
+  | { type: "REMOVE_ITEM"; productId: string }
   | { type: "CLEAR_CART" }
-  | { type: "INCREASE_ITEM"; productId: number }
-  | { type: "DECREASE_ITEM"; productId: number };
+  | { type: "INCREASE_ITEM"; productId: string }
+  | { type: "DECREASE_ITEM"; productId: string }
+  | { type: "SET_CART"; items: CartItem[] };
 const initialState: CartState = {
   items: [],
 };
@@ -21,7 +30,7 @@ function cartReducer(state: CartState, action: Action): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
       const itemIndex = state.items.findIndex(
-        (item) => item.id === action.product.id
+        (item) => item._id === action.product._id
       );
       const updatedItems = [...state.items];
 
@@ -36,7 +45,7 @@ function cartReducer(state: CartState, action: Action): CartState {
 
     case "INCREASE_ITEM": {
       const updatedItems = state.items.map((item) =>
-        item.id === action.productId
+        item._id === action.productId
           ? { ...item, quantity: item.quantity + 1 }
           : item
       );
@@ -46,7 +55,7 @@ function cartReducer(state: CartState, action: Action): CartState {
     case "DECREASE_ITEM": {
       const updatedItems = state.items
         .map((item) =>
-          item.id === action.productId
+          item._id === action.productId
             ? { ...item, quantity: item.quantity - 1 }
             : item
         )
@@ -56,7 +65,7 @@ function cartReducer(state: CartState, action: Action): CartState {
 
     case "REMOVE_ITEM": {
       const updatedItems = state.items.filter(
-        (item) => item.id !== action.productId
+        (item) => item._id !== action.productId
       );
       return { items: updatedItems };
     }
@@ -64,6 +73,9 @@ function cartReducer(state: CartState, action: Action): CartState {
     case "CLEAR_CART": {
       return { items: [] };
     }
+
+    case "SET_CART":
+      return { items: action.items };
 
     default:
       return state;
@@ -73,22 +85,98 @@ function cartReducer(state: CartState, action: Action): CartState {
 const CartContext = createContext<{
   state: CartState;
   addItem: (product: Product) => void;
-  removeItem: (productId: number) => void;
+  removeItem: (productId: string) => void;
   clearCart: () => void;
-  increaseItem: (productId: number) => void;
-  decreaseItem: (productId: number) => void;
+  increaseItem: (productId: string) => void;
+  decreaseItem: (productId: string) => void;
 } | null>(null);
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const { user, logout } = useAuth();
+
+  // 1. Load user cart on login
+  useEffect(() => {
+    const loadUserCart = async () => {
+      if (user && user.role === "user") {
+        try {
+          const res = await axios.get(
+            `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          );
+          console.log(res.data.items);
+          dispatch({ type: "SET_CART", items: res.data.items });
+        } catch (error) {
+          console.error("Failed to load user cart:", error);
+
+          if (axios.isAxiosError(error) && error.response?.status === 401) {
+            alert("Session expired. Please login again.");
+            logout(); // clear user + redirect to login
+          }
+        }
+      }
+    };
+
+    loadUserCart();
+  }, [logout, user]);
+
+  // 2. Save cart to backend when items change (for logged-in user)
+  useEffect(() => {
+    const saveCart = async () => {
+      if (user && user.role === "user") {
+        try {
+          console.log(state);
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/cart`,
+            {
+              items: state.items.map((item) => ({
+                productId: item._id,
+                quantity: item.quantity,
+              })),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            }
+          );
+        } catch (error) {
+          console.error("Failed to save cart:", error);
+        }
+      }
+    };
+
+    if (state.items.length > 0) {
+      saveCart();
+    }
+  }, [state.items, user]);
 
   const addItem = (product: Product) => dispatch({ type: "ADD_ITEM", product });
-  const removeItem = (productId: number) =>
+  const removeItem = (productId: string) =>
     dispatch({ type: "REMOVE_ITEM", productId });
-  const clearCart = () => dispatch({ type: "CLEAR_CART" });
-  const increaseItem = (productId: number) =>
+  const clearCart = async () => {
+    try {
+      if (user) {
+        await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/cart`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+        console.log("Cart cleared from backend");
+      }
+
+      dispatch({ type: "CLEAR_CART" });
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
+    }
+  };
+  const increaseItem = (productId: string) =>
     dispatch({ type: "INCREASE_ITEM", productId });
-  const decreaseItem = (productId: number) =>
+  const decreaseItem = (productId: string) =>
     dispatch({ type: "DECREASE_ITEM", productId });
 
   return (

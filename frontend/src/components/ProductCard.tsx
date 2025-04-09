@@ -1,6 +1,6 @@
-import { Product } from "@/data/products";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import { Product } from "@/types/Product";
 
 type ProductCardProps = {
   product: Product;
