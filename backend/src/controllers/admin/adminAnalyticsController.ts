@@ -63,11 +63,11 @@ export const getOrderTrends = async (req: Request, res: Response) => {
   try {
     // Default to last 7 days
     const range = req.query.range || '7d';
-
-    // Determine date range & group format
     let dateFrom = new Date();
     let groupBy: any = {};
+    const sort: any = { '_id.year': 1, '_id.month': 1 };
 
+    // 🔁 Subtract time range first
     if (range === '7d') {
       dateFrom.setDate(dateFrom.getDate() - 7);
       groupBy = {
@@ -75,6 +75,7 @@ export const getOrderTrends = async (req: Request, res: Response) => {
         month: { $month: '$createdAt' },
         day: { $dayOfMonth: '$createdAt' }
       };
+      sort['_id.day'] = 1;
     } else if (range === '30d') {
       dateFrom.setDate(dateFrom.getDate() - 30);
       groupBy = {
@@ -82,6 +83,7 @@ export const getOrderTrends = async (req: Request, res: Response) => {
         month: { $month: '$createdAt' },
         day: { $dayOfMonth: '$createdAt' }
       };
+      sort['_id.day'] = 1;
     } else if (range === '365d') {
       dateFrom.setFullYear(dateFrom.getFullYear() - 1);
       groupBy = {
@@ -90,29 +92,29 @@ export const getOrderTrends = async (req: Request, res: Response) => {
       };
     }
 
+    // ✅ Then normalize to midnight
+    dateFrom.setHours(0, 0, 0, 0);
+
+    // ✅ Then log and query
+    console.log("Date From:", dateFrom.toISOString());
+
+    const matchedOrders = await Order.find({ createdAt: { $gte: dateFrom } });
+    console.log("Matched Orders:", matchedOrders.length);
+
+
     const trends = await Order.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: dateFrom }
-        }
-      },
+      { $match: { createdAt: { $gte: dateFrom } } },
       {
         $group: {
           _id: groupBy,
           totalSales: { $sum: '$totalPrice' },
           totalOrders: { $sum: 1 },
-          deliveredOrders: {
-            $sum: { $cond: ['$isDelivered', 1, 0] }
-          },
-          paidOrders: {
-            $sum: { $cond: ['$isPaid', 1, 0] }
-          },
-          unpaidOrders: {
-            $sum: { $cond: ['$isPaid', 0, 1] }
-          }
+          deliveredOrders: { $sum: { $cond: ['$isDelivered', 1, 0] } },
+          paidOrders: { $sum: { $cond: ['$isPaid', 1, 0] } },
+          unpaidOrders: { $sum: { $cond: ['$isPaid', 0, 1] } }
         }
       },
-      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
+      { $sort: sort }
     ]);
 
     res.json(trends);
